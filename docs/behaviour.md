@@ -35,3 +35,7 @@ Import replaces the editor contents and requires saving. Export includes current
 ## Early-beta limitations
 
 Tests simulate Chrome APIs; event races, restored sessions, active tab dragging, and platform-specific behaviour still need wider live testing. Some transient tab operations can fail while Chrome is rearranging tabs; reapply after the operation completes. Multiple editor tabs can overwrite each other’s settings. Do not use complex or untrusted regex patterns.
+
+## Manual toolbar actions
+
+The pinned icon opens a popup with Apply rules, Order groups, Regroup all tabs, and Open settings. Manual actions use saved rules across all open windows and run even while automatic grouping is paused. Apply rules respects saved group protection, including manually ungrouped tabs. Regroup all tabs ignores protection for that invocation and ungroups unmatched web tabs. Both honour the saved group-order option. Order groups forces ordering for that invocation and leaves membership intact. No action changes saved preferences. The editor's Apply to open tabs also runs while automatic grouping is paused.

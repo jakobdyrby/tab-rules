@@ -2,8 +2,8 @@ import { DEFAULT_SETTINGS, findRule, isWebUrl } from './rules.js';
 
 // All callers are serialized by the service worker, including membership events.
 export function createOrganizer(api) {
-  async function organize(tabId) {
-    const { settings = DEFAULT_SETTINGS } = await api.storage.local.get('settings');
+  async function organize(tabId, settingsOverride) {
+    const settings = settingsOverride ?? (await api.storage.local.get('settings')).settings ?? DEFAULT_SETTINGS;
     if (!settings.enabled) return 'paused';
     let tab;
     try { tab = await api.tabs.get(tabId); }
@@ -45,11 +45,11 @@ export function createOrganizer(api) {
     await api.storage.session.set({ [key]: { groupId, manual: true } });
   }
 
-  async function applyAll() {
+  async function applyAll(settingsOverride) {
     const counts = {};
     for (const tab of await api.tabs.query({})) {
       try {
-        const result = await organize(tab.id);
+        const result = await organize(tab.id, settingsOverride);
         counts[result] = (counts[result] || 0) + 1;
       } catch (error) {
         counts.failed = (counts.failed || 0) + 1;

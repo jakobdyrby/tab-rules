@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Tab Rules</title><link rel="stylesheet" href="popup.css"><script type="module" src="popup.js"></script></head>
+<body>
+<header><img src="icons/icon-48.png" width="36" height="36" alt=""><div><h1>Tab Rules</h1><p>Tidy up on your terms.</p></div></header>
+<main>
+<p class="scope">Uses saved rules across your open windows.</p>
+<button data-action="apply" class="primary"><strong>Apply rules</strong><span>Group tabs using your protection settings.</span></button>
+<button data-action="order"><strong>Order groups</strong><span>Arrange groups in rule order. Keep tabs where they are.</span></button>
+<div class="regroup"><button data-action="regroup"><strong>Regroup all tabs</strong><span>Ignore group protection this time. Unmatched tabs leave their group.</span></button></div>
+<p id="status" role="status" aria-live="polite">Works even when automatic grouping is off.</p>
+</main>
+<footer><button id="settings">Open settings <span aria-hidden="true">↗</span></button></footer>
+</body></html>

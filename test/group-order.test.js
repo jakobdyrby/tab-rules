@@ -72,3 +72,14 @@ test('settings migration defaults ordering off and validates the flag', () => {
   assert.equal(normalizeSettings({...settings,orderGroups:true}).orderGroups, true);
   assert.throws(() => validateSettings({...settings,orderGroups:'yes'}));
 });
+
+test('manual ordering bypasses both toggles without changing membership or saved preferences', async () => {
+  const { runManualAction } = await import('../extension/manual-actions.js');
+  const f = fixture(); f.settings.enabled = false; f.settings.orderGroups = false;
+  const before = structuredClone(f.settings);
+  const memberships = new Map(f.tabs().map(t => [t.id, t.groupId]));
+  await runManualAction(f.api, { applyAll() { assert.fail('Order must not regroup tabs'); } }, 'order');
+  assert.deepEqual(f.tabs().map(t => t.id), [10,15,16,11,12,13,14]);
+  for (const tab of f.tabs()) assert.equal(tab.groupId, memberships.get(tab.id));
+  assert.deepEqual(f.settings, before);
+});

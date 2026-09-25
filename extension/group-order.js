@@ -1,7 +1,7 @@
 import { DEFAULT_SETTINGS } from './rules.js';
 
-export async function orderGroups(api) {
-  const { settings = DEFAULT_SETTINGS } = await api.storage.local.get('settings');
+export async function orderGroups(api, settingsOverride) {
+  const settings = settingsOverride ?? (await api.storage.local.get('settings')).settings ?? DEFAULT_SETTINGS;
   if (!settings.enabled || !settings.orderGroups) return;
   const rank = new Map();
   for (const rule of settings.rules) {

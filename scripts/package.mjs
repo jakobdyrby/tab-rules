@@ -8,6 +8,7 @@ const manifest = JSON.parse(readFileSync(join(root, 'extension/manifest.json'), 
 // Explicit allowlist keeps development files and personal exports out of releases.
 const files = [
   'manifest.json', 'background.js', 'organizer.js', 'group-order.js',
+  'manual-actions.js', 'popup.html', 'popup.js', 'popup.css',
   'rules.js', 'options.html', 'options.js', 'url-suggestions.js', 'styles.css',
   ...Object.values(manifest.icons),
 ].sort();

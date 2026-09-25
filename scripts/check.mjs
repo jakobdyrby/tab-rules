@@ -10,7 +10,7 @@ const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 function assert(condition, message) { if (!condition) throw new Error(message); }
 assert(manifest.version === pkg.version, 'Package and manifest versions must match.');
 assert(manifest.manifest_version === 3, 'Expected Manifest V3.');
-for (const path of [manifest.background.service_worker, manifest.options_page, ...Object.values(manifest.icons), ...Object.values(manifest.action.default_icon)]) {
+for (const path of [manifest.background.service_worker, manifest.options_page, manifest.action.default_popup, ...Object.values(manifest.icons), ...Object.values(manifest.action.default_icon)]) {
   assert(existsSync(join(extension, path)), `Missing manifest resource: ${path}`);
 }
 for (const [size, path] of Object.entries(manifest.icons)) {

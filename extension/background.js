@@ -1,3 +1,4 @@
+import { runManualAction } from './manual-actions.js';
 import { orderGroups } from './group-order.js';
 import { createOrganizer } from './organizer.js';
 import { DEFAULT_SETTINGS } from './rules.js';
@@ -39,7 +40,6 @@ chrome.tabs.onReplaced.addListener((addedId, removedId) => {
     return organizer.organize(addedId);
   });
 });
-chrome.action.onClicked.addListener(() => chrome.runtime.openOptionsPage());
 chrome.runtime.onInstalled.addListener(() => enqueue(async () => {
   const { settings } = await chrome.storage.local.get('settings');
   if (!settings) {
@@ -48,12 +48,8 @@ chrome.runtime.onInstalled.addListener(() => enqueue(async () => {
   }
 }));
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
-  if (sender.id !== chrome.runtime.id || message?.type !== 'apply') return;
-  enqueue(async () => {
-    const counts = await organizer.applyAll();
-    await orderGroups(chrome);
-    return counts;
-  }).then(
+  if (sender.id !== chrome.runtime.id || !['apply', 'order', 'regroup'].includes(message?.type)) return;
+  enqueue(() => runManualAction(chrome, organizer, message.type)).then(
     counts => respond({ ok: true, counts }),
     error => respond({ ok: false, error: error.message })
   );

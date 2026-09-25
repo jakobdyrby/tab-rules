@@ -146,3 +146,27 @@ test('a failed tab operation does not prevent other tabs from being organized', 
   assert.equal(counts.failed, 1);
   assert.equal(counts.grouped, 1);
 });
+
+ test('manual actions work while paused, preserve settings, and override protection only for regroup', async () => {
+  const { runManualAction } = await import('../extension/manual-actions.js');
+  const f = fixture(); f.settings.enabled = false;
+  f.add(1); f.add(2, { groupId: 42 });
+  f.add(3, { groupId: 42, url: 'https://example.com' });
+  f.add(4, { pinned: true, groupId: 42 });
+  f.add(5, { incognito: true, groupId: 42 });
+  f.add(6, { groupId: 42, url: 'chrome://settings' });
+  f.add(7); await f.organizer.membershipChanged(7, -1);
+  const before = structuredClone(f.settings);
+  const applied = await runManualAction(f.api, f.organizer, 'apply');
+  assert.equal(applied.grouped, 1);
+  assert.equal(f.tabs.get(2).groupId, 42);
+  assert.equal(f.tabs.get(7).groupId, -1);
+  const regrouped = await runManualAction(f.api, f.organizer, 'regroup');
+  assert.equal(regrouped.grouped, 2);
+  assert.equal(regrouped.ungrouped, 1);
+  assert.equal(f.tabs.get(2).groupId, f.tabs.get(1).groupId);
+  assert.equal(f.tabs.get(7).groupId, f.tabs.get(1).groupId);
+  for (const id of [4, 5, 6]) assert.equal(f.tabs.get(id).groupId, 42);
+  assert.deepEqual(f.settings, before);
+  assert.equal(await f.organizer.organize(1), 'paused');
+});

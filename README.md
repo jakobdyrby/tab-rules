@@ -42,7 +42,7 @@ Follow steps 3–4 above, selecting the **extension/** folder. No build or depen
 
 ## Quick start
 
-1. Open the editor from the extension toolbar icon.
+1. Click the extension toolbar icon, then **Open settings**.
 2. Add a **Domain** filter for `github.com`, group name **Code**, and a colour.
 3. Save and open a matching URL in an ungrouped tab.
 4. Use **Apply to open tabs** to organize existing tabs.
@@ -56,6 +56,17 @@ Follow steps 3–4 above, selecting the **extension/** folder. No build or depen
 Put specific rules above broader ones using the rule’s **⋯** menu. Add multiple filters to send different sites to the same group.
 
 Read the [behaviour guide](docs/behaviour.md) for group protection, automatic ordering, matching details, and limitations.
+
+## Toolbar actions
+
+Pin Tab Rules in Chrome and click its icon to open the popup:
+
+- **Apply rules** groups open tabs using saved rules and your group-protection preference.
+- **Order groups** arranges existing groups in rule order without changing membership.
+- **Regroup all tabs** ignores protection for that run; unmatched web tabs leave their groups.
+- **Open settings** opens the rule editor.
+
+All manual actions work with automatic grouping off, across open windows. They do not change saved preferences. Pinned, incognito, and non-web tabs remain excluded from regrouping. Apply and Regroup also order groups when the saved ordering option is on. Unsaved editor changes are not used by the popup.
 
 ## Privacy and permissions
 
