@@ -47,7 +47,15 @@ function flashNoMatch() {
   tester.classList.add('test-no-match');
   noMatchTimer = setTimeout(clearNoMatchHighlight, 2400);
 }
-function changed() { clearRuleHighlight(); clearNoMatchHighlight(); dirty = true; status('Unsaved changes'); }
+function setDirty(value) {
+  dirty = value;
+  $('.savebar').classList.toggle('has-unsaved', dirty);
+  $('#save-state').textContent = dirty ? 'Unsaved changes' : 'All changes saved';
+  $('#save').classList.toggle('primary', dirty);
+  $('#apply').firstChild.textContent = dirty ? 'Save & apply to open tabs ' : 'Apply to open tabs ';
+  document.title = `${dirty ? '● ' : ''}Tab Rules · A place for every tab`;
+}
+function changed() { clearRuleHighlight(); clearNoMatchHighlight(); setDirty(true); status('Save your changes to use them for grouping.'); }
 function render() {
   clearRuleHighlight();
   $('#enabled').checked = settings.enabled;
@@ -162,8 +170,10 @@ function addRule(example = false) {
 }
 async function save() {
   validateSettings(settings);
-  await storage.set({ settings: structuredClone(settings) });
-  dirty = false;
+  const snapshot = structuredClone(settings);
+  await storage.set({ settings: snapshot });
+  setDirty(JSON.stringify(settings) !== JSON.stringify(snapshot));
+  if (dirty) { status('Earlier changes saved. Save again to include your latest edits.'); return; }
   status(isExtension ? 'Saved · Ready for your next tab' : 'Saved in browser preview · Load the extension to group real tabs');
 }
 async function run(action) {
@@ -183,7 +193,6 @@ $('#save').addEventListener('click', () => run(save));
 $('#apply').addEventListener('click', () => run(async () => {
   await save();
   if (!isExtension) { status('Preview only · Load this folder as a Chrome extension to organize tabs.'); return; }
-  if (!settings.enabled) { status('Automatic grouping is paused. Enable it before applying rules.'); return; }
   $('#apply').disabled = true;
   status('Organizing open tabs…');
   try {

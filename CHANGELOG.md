@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Show a persistent unsaved indicator, highlighted save bar and Save button, and browser-tab marker while editing.
+- Fix the editor’s Apply action being blocked while automatic grouping was paused.
+
 - Refresh existing group colours when manually applying or regrouping tabs, including protected groups.
 
 - Add a toolbar popup with Apply rules, Order groups, Regroup all tabs, and Open settings.

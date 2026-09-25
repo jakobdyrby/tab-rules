@@ -136,3 +136,12 @@
 .suggestion-heading > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .suggestion-heading small { margin-left: auto; flex-shrink: 0; color: #6f7b70; font-size: 10px; }
 .suggestion-url { display: block; color: #737e77; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; }
+
+/* Persistent save state is separate from export, import, and error feedback. */
+.save-state { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: #637461; margin-bottom: 5px; }
+.save-state::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #8a9b85; flex-shrink: 0; }
+.savebar.has-unsaved { background: #fff8eaf5; border-top-color: #d6ae60; box-shadow: 0 -3px 16px #79541312; }
+.has-unsaved .save-state { color: #805214; }
+.has-unsaved .save-state::before { background: #b67718; }
+.has-unsaved #apply { background: white; color: #304c3c; border-color: #d5ddd1; }
+@media (max-width: 580px) { .save-actions { flex-wrap: wrap; } }
