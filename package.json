@@ -1,0 +1,7 @@
+{
+  "name": "tab-rules",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test", "check": "node --check background.js && node --check organizer.js && node --check rules.js && node --check options.js" }
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tab Rules · A place for every tab</title>
+  <link rel="icon" type="image/png" href="icons/icon-32.png">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="options.js"></script>
+</head>
+<body>
+  <main>
+    <header><a class="brand" href="options.html"><img class="app-icon" src="icons/icon-48.png" width="40" height="40" alt=""> Tab Rules <span class="version">LOCAL / 0.1</span></a><span class="privacy">Only in your browser</span></header>
+    <section class="intro"><p class="eyebrow">LESS SORTING. MORE FOCUS.</p><h1>A place for every tab.</h1><p>Tell your tabs where they belong.<br>We’ll take it from there.</p></section>
+    <section class="settings panel" aria-label="Grouping settings">
+      <label class="setting"><input type="checkbox" id="enabled"><span><strong>Automatic grouping</strong><small>Organize tabs as they open and navigate.</small></span></label>
+      <label class="setting"><input type="checkbox" id="respectManual"><span><strong>Respect existing groups</strong><small>Keep tabs in their current group when opening URLs.</small></span></label>
+    </section>
+    <section aria-labelledby="rules-title">
+      <div class="section-heading"><div><h2 id="rules-title">Your rules <span id="count" class="badge">0</span></h2><p>First matching rule wins. Any filter within a rule can match.</p></div><button id="add" class="primary">+ Add rule</button></div>
+      <div id="rules"></div>
+      <div id="empty" class="empty panel"><span class="empty-icon">↳</span><h3>Give your tabs a little direction.</h3><p>Start with a domain, a group name, and a colour.<br>One rule can bring a whole project together.</p><button id="example">Try a GitHub rule</button></div>
+    </section>
+    <section class="tester panel" aria-labelledby="tester-title"><div><p class="eyebrow">TRY BEFORE YOU TIDY</p><h2 id="tester-title">Where would this tab go?</h2><p>Test a URL against your current rules, including unsaved edits.</p></div><label for="test-url" class="sr-only">URL to test</label><div class="test-input"><input id="test-url" type="url" placeholder="e.g. https://github.com/your-org/project"><button id="test">Test URL <span aria-hidden="true">↗</span></button></div><p id="test-result" class="result-placeholder" role="status">Testing a URL jumps to the first matching rule.</p></section>
+    <details class="help panel"><summary>A few things to know</summary><p><strong>Domain</strong> matches an exact hostname and its subdomains: <code>github.com</code>.</p><p><strong>Wildcard</strong> matches the full URL, with <code>*</code> for any text: <code>https://github.com/your-org/*</code>.</p><p><strong>Regex</strong> uses a JavaScript regular expression, without surrounding slashes or flags: <code>^https://dev\.azure\.com/</code>. Matching is case-sensitive; keep expressions simple.</p><p>Groups are reused by exact name within the same window. Colour is set when a group is created; existing group colours are preserved. Pinned, incognito, and non-web tabs are skipped. With “Respect existing groups” off, web tabs that stop matching any rule leave their group.</p><p>With “Respect existing groups” enabled, URLs opened in any group stay there, even if another rule matches. Only ungrouped tabs are automatically grouped. Manually ungrouped tabs stay ungrouped for the browser session. Turn this option off to let rules reorganize grouped tabs too.</p><p>Saving affects future tab activity. “Apply to open tabs” saves your edits and checks every open window, respecting the settings above. Nothing leaves your browser.</p></details>
+    <footer><span>No account. No cloud. Just your rules.</span></footer>
+    <div class="savebar"><div class="savebar-info"><p id="status" role="status" aria-live="polite">Loading rules…</p><div class="file-actions"><button id="import" class="text-button">Import rules</button><button id="export" class="text-button">Export rules</button><input id="import-file" type="file" accept="application/json,.json" hidden></div></div><div class="save-actions"><button id="save">Save changes</button><button id="apply" class="primary">Apply to open tabs <span aria-hidden="true">↗</span></button></div></div>
+  </main>
+  <template id="rule-template">
+    <article class="rule panel">
+      <div class="rule-top"><span class="rule-number"></span><label class="rule-enable"><input type="checkbox" data-field="enabled"> Enabled</label><div class="rule-actions"><button data-action="up" title="Move rule up" aria-label="Move rule up">↑</button><button data-action="down" title="Move rule down" aria-label="Move rule down">↓</button><button data-action="delete" title="Delete rule" aria-label="Delete rule">×</button></div></div>
+      <div class="rule-fields group-fields"><label>Group name<input data-field="groupName" type="text" placeholder="Code" maxlength="80"></label><label>Colour<select data-field="color"></select></label></div>
+      <p class="filter-help">Match any of these filters</p>
+      <div class="filters"></div>
+      <div class="rule-footer"><button class="add-filter text-button">+ Add filter</button><button class="test-now" type="button">Test now <span aria-hidden="true">↓</span></button></div>
+    </article>
+  </template>
+  <template id="filter-template">
+    <div class="filter-row"><span class="filter-join"></span><label>Match type<select data-filter="type"><option value="domain">Domain</option><option value="wildcard">URL wildcard</option><option value="regex">Regular expression</option></select></label><label class="pattern">URL pattern<input data-filter="pattern" type="text" placeholder="github.com" spellcheck="false" autocomplete="off"></label><button class="remove-filter" title="Remove filter" aria-label="Remove filter">×</button></div>
+  </template>
+</body>
+</html>
