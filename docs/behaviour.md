@@ -10,7 +10,7 @@ The extension checks newly opened tabs, URL changes, completed loads, unpinning,
 
 ## Groups and manual choices
 
-Groups are reused by exact name within the same window; tabs are never moved between windows. Newly created groups receive the rule’s colour. Existing group colours and collapsed state are preserved. If several groups share a name, the current group is preferred, then the first returned by Chrome.
+Groups are reused by exact name within the same window; tabs are never moved between windows. Newly created groups receive the rule’s colour. Automatic grouping preserves existing group colours. Manual Apply rules (including the editor’s Apply to open tabs) and Regroup all tabs refresh named groups to the first enabled rule’s colour, even with group protection on. Groups without eligible web tabs are skipped. Collapsed state is preserved. Order groups only changes positions. If several groups share a name, the current group is preferred, then the first returned by Chrome.
 
 **Respect existing groups**, on by default, keeps a tab in any existing group even when another rule matches. This includes groups created by the extension. Manually ungrouped tabs stay ungrouped for the browser session.
 

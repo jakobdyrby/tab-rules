@@ -11,7 +11,7 @@ for (const button of document.querySelectorAll('[data-action]')) {
       const counts = result.counts;
       status.textContent = button.dataset.action === 'order'
         ? 'Done. Matching groups are in rule order.'
-        : `Done · ${counts.grouped || 0} grouped · ${counts.ungrouped || 0} ungrouped · ${counts.protected || 0} protected · ${counts.failed || 0} failed`;
+        : `Done · ${counts.grouped || 0} grouped · ${counts.recoloured || 0} recoloured · ${counts.ungrouped || 0} ungrouped · ${counts.protected || 0} protected · ${counts.failed || 0} failed`;
       status.classList.toggle('error', Boolean(counts.failed));
     } catch (error) {
       status.textContent = error.message;

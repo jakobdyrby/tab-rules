@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refresh existing group colours when manually applying or regrouping tabs, including protected groups.
+
 - Add a toolbar popup with Apply rules, Order groups, Regroup all tabs, and Open settings.
 - Allow manual grouping while automatic grouping is paused, without changing saved preferences.
 

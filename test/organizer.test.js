@@ -170,3 +170,28 @@ test('a failed tab operation does not prevent other tabs from being organized', 
   assert.deepEqual(f.settings, before);
   assert.equal(await f.organizer.organize(1), 'paused');
 });
+
+test('manual apply refreshes protected group colours across windows using first enabled rule', async () => {
+  const { runManualAction } = await import('../extension/manual-actions.js');
+  const f = fixture(); f.settings.enabled = false;
+  f.settings.rules.unshift({ ...f.settings.rules[0], id: 'disabled', enabled: false, color: 'red' });
+  f.settings.rules.push({ ...f.settings.rules[1], id: 'duplicate', groupName: 'Code', color: 'yellow' });
+  for (const [id, title, extra] of [[42, 'Code', {}], [43, 'Code', {windowId:2}], [44, 'Other', {}], [45, 'Code', {incognito:true}], [46, 'Code', {url:'chrome://settings'}]]) {
+    f.add(id, { groupId:id, ...extra });
+    f.groups.set(id, {id, title, windowId:extra.windowId || 1, color:'pink', collapsed:true});
+  }
+  const before = structuredClone(f.settings);
+  const counts = await runManualAction(f.api, f.organizer, 'apply');
+  assert.equal(counts.recoloured, 2);
+  for (const id of [42,43]) assert.equal(f.groups.get(id).color, 'blue');
+  for (const id of [44,45,46]) assert.equal(f.groups.get(id).color, 'pink');
+  for (const id of [42,43,44,45,46]) {
+    assert.equal(f.tabs.get(id).groupId, id);
+    assert.equal(f.groups.get(id).collapsed, true);
+  }
+  assert.deepEqual(f.settings, before);
+  assert.equal((await runManualAction(f.api, f.organizer, 'apply')).recoloured, undefined);
+  f.settings.rules[1].color = 'purple';
+  assert.equal((await runManualAction(f.api, f.organizer, 'regroup')).recoloured, 2);
+  assert.equal(f.groups.get(42).color, 'purple');
+});

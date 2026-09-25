@@ -190,7 +190,7 @@ $('#apply').addEventListener('click', () => run(async () => {
     const result = await chrome.runtime.sendMessage({ type: 'apply' });
     if (!result?.ok) throw new Error(result?.error || 'The extension did not respond. Try reloading it.');
     const counts = result.counts;
-    status(`Done · ${counts.grouped || 0} grouped · ${counts.ungrouped || 0} ungrouped · ${counts.unchanged || 0} already in place · ${counts.protected || 0} protected · ${counts.failed || 0} failed`, Boolean(counts.failed));
+    status(`Done · ${counts.grouped || 0} grouped · ${counts.recoloured || 0} recoloured · ${counts.ungrouped || 0} ungrouped · ${counts.unchanged || 0} already in place · ${counts.protected || 0} protected · ${counts.failed || 0} failed`, Boolean(counts.failed));
   } finally { $('#apply').disabled = false; }
 }));
 const urlAutocomplete = setupUrlSuggestions($('#test-url'), $('#url-suggestions'), isExtension);
