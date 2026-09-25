@@ -33,4 +33,4 @@ The optional local web preview uses that website origin’s local storage instea
 
 Export creates a JSON file containing your rules and preferences, not recent test URLs or session data. You decide where to save or share it. Bug reports posted on GitHub are public and handled by GitHub under its own policies. Share only sanitized examples.
 
-Questions can be submitted at https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/issues without including private browsing data. Changes to this policy will be documented in the repository.
+Questions can be submitted at https://github.com/jakobdyrby/tab-rules/issues without including private browsing data. Changes to this policy will be documented in the repository.

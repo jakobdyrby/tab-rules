@@ -2,7 +2,7 @@
 <h1 align="center">Tab Rules</h1>
 <p align="center">A place for every tab. Organize native Chrome tab groups with URL rules.</p>
 
-[![CI](https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/actions/workflows/ci.yml/badge.svg)](https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/actions/workflows/ci.yml)
+[![CI](https://github.com/jakobdyrby/tab-rules/actions/workflows/ci.yml/badge.svg)](https://github.com/jakobdyrby/tab-rules/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **Early beta · Chrome 112+ · No account, analytics, or backend.** Not yet published in the Chrome Web Store.
@@ -24,7 +24,7 @@
 
 ### From a release
 
-1. Download `tab-rules-0.1.0.zip` from [Releases](https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/releases).
+1. Download `tab-rules-0.1.0.zip` from [Releases](https://github.com/jakobdyrby/tab-rules/releases).
 2. Extract it to a permanent folder; keep it there while the extension is installed.
 3. Open `chrome://extensions` in Chrome and enable **Developer mode**.
 4. Select **Load unpacked** and choose the extracted folder containing `manifest.json`.
@@ -32,8 +32,8 @@
 ### From source
 
 ```sh
-git clone https://github.com/jakobdyrby/tool-chrome-tab-group-organizer.git
-cd tool-chrome-tab-group-organizer
+git clone https://github.com/jakobdyrby/tab-rules.git
+cd tab-rules
 ```
 
 Follow steps 3–4 above, selecting the **extension/** folder. No build or dependency installation is required.
@@ -92,7 +92,7 @@ test/               Node tests with simulated Chrome APIs
 
 ## Contributing and support
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Report problems through [GitHub Issues](https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/issues), using sanitized URLs and patterns. Please do not upload browsing history, credentials, or private rule exports.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Report problems through [GitHub Issues](https://github.com/jakobdyrby/tab-rules/issues), using sanitized URLs and patterns. Please do not upload browsing history, credentials, or private rule exports.
 
 ## Release status
 
