@@ -7,8 +7,8 @@
 
 **Early beta · Chrome 112+ · No account, analytics, or backend.** Not yet published in the Chrome Web Store.
 
-![Illustration of the rule editor](docs/screenshots/editor-overview.svg)
-*Interface illustration. Actual appearance may vary.*
+![Tab Rules editor with example rules and a highlighted matching filter](docs/screenshots/editor-overview.png)
+*Editor preview with example rules and a matching URL test.*
 
 ## Features
 
