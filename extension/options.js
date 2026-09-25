@@ -146,15 +146,6 @@ function render() {
       });
     }
     renderFilters();
-    card.querySelector('.test-now').addEventListener('click', () => {
-      clearRuleHighlight();
-      clearNoMatchHighlight();
-      $('.tester').scrollIntoView({
-        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-        block: 'center'
-      });
-      $('#test-url').focus({ preventScroll: true });
-    });
     card.querySelector('.add-filter').addEventListener('click', () => {
       rule.filters.push({ type: 'wildcard', pattern: '' });
       changed(); renderFilters();
@@ -189,6 +180,16 @@ $('#example').addEventListener('click', () => addRule(true));
 for (const key of ['enabled', 'respectManual', 'orderGroups']) $(`#${key}`).addEventListener('change', event => {
   settings[key] = event.target.checked; changed();
 });
+$('#test-now').addEventListener('click', () => {
+      clearRuleHighlight();
+      clearNoMatchHighlight();
+      $('.tester').scrollIntoView({
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+        block: 'center'
+      });
+      $('#test-url').focus({ preventScroll: true });
+    });
+
 $('#save').addEventListener('click', () => run(save));
 $('#apply').addEventListener('click', () => run(async () => {
   await save();

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Replace per-rule Test now buttons with a single action in the sticky bottom bar.
+
 - Show a persistent unsaved indicator, highlighted save bar and Save button, and browser-tab marker while editing.
 - Fix the editor’s Apply action being blocked while automatic grouping was paused.
 

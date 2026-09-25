@@ -21,7 +21,7 @@
   background: #f6f7f2;
   border-bottom: 1px solid var(--border);
 }
-.test-now { padding: 8px 12px; }
+#test-now { color: var(--green); font-weight: 650; }
 .savebar { z-index: 3; }
 .savebar > .savebar-info { flex-direction: column; align-items: flex-start; gap: 4px; flex-shrink: 1; min-width: 0; }
 .savebar .file-actions { display: flex; gap: 8px; }
