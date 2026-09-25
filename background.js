@@ -1,3 +1,4 @@
+import { orderGroups } from './group-order.js';
 import { createOrganizer } from './organizer.js';
 import { DEFAULT_SETTINGS } from './rules.js';
 
@@ -48,9 +49,32 @@ chrome.runtime.onInstalled.addListener(() => enqueue(async () => {
 }));
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (sender.id !== chrome.runtime.id || message?.type !== 'apply') return;
-  enqueue(() => organizer.applyAll()).then(
+  enqueue(async () => {
+    const counts = await organizer.applyAll();
+    await orderGroups(chrome);
+    return counts;
+  }).then(
     counts => respond({ ok: true, counts }),
     error => respond({ ok: false, error: error.message })
   );
   return true;
 });
+
+// Debounce Chrome's own move events; ordering is idempotent, so no feedback loop.
+let orderTimer;
+function scheduleGroupOrder() {
+  clearTimeout(orderTimer);
+  orderTimer = setTimeout(() => enqueue(() => orderGroups(chrome)), 350);
+}
+chrome.tabGroups.onCreated.addListener(scheduleGroupOrder);
+chrome.tabGroups.onUpdated.addListener(scheduleGroupOrder);
+chrome.tabGroups.onMoved.addListener(scheduleGroupOrder);
+chrome.tabs.onMoved.addListener(scheduleGroupOrder);
+chrome.tabs.onAttached.addListener(scheduleGroupOrder);
+chrome.tabs.onUpdated.addListener((tabId, change) => {
+  if (change.groupId !== undefined || change.pinned !== undefined) scheduleGroupOrder();
+});
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.settings) scheduleGroupOrder();
+});
+chrome.runtime.onStartup.addListener(scheduleGroupOrder);

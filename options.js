@@ -1,3 +1,4 @@
+import { setupUrlSuggestions } from './url-suggestions.js';
 import { COLORS, DEFAULT_SETTINGS, compileFilter, findRule, isWebUrl, normalizeSettings, validateSettings } from './rules.js';
 
 const $ = selector => document.querySelector(selector);
@@ -51,6 +52,7 @@ function render() {
   clearRuleHighlight();
   $('#enabled').checked = settings.enabled;
   $('#respectManual').checked = settings.respectManual;
+  $('#orderGroups').checked = settings.orderGroups;
   $('#count').textContent = settings.rules.length;
   $('#empty').hidden = settings.rules.length > 0;
   $('#rules').replaceChildren();
@@ -70,16 +72,44 @@ function render() {
         changed();
       });
     }
+    const actions = card.querySelector('.rule-actions');
+    actions.addEventListener('toggle', () => {
+      if (actions.open) {
+        for (const other of document.querySelectorAll('.rule-actions[open]')) {
+          if (other !== actions) other.open = false;
+        }
+      }
+    });
+    actions.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        actions.open = false;
+        actions.querySelector('summary').focus();
+        event.preventDefault();
+      }
+    });
+    actions.addEventListener('focusout', event => {
+      if (!actions.contains(event.relatedTarget)) actions.open = false;
+    });
     card.querySelector('[data-action=up]').disabled = index === 0;
+    card.querySelector('[data-action=first]').disabled = index === 0;
     card.querySelector('[data-action=down]').disabled = index === settings.rules.length - 1;
+    card.querySelector('[data-action=last]').disabled = index === settings.rules.length - 1;
     for (const button of card.querySelectorAll('[data-action]')) button.addEventListener('click', () => {
       const action = button.dataset.action;
       if (action === 'delete') settings.rules.splice(index, 1);
       else {
-        const to = index + (action === 'up' ? -1 : 1);
-        [settings.rules[index], settings.rules[to]] = [settings.rules[to], settings.rules[index]];
+        const to = action === 'first' ? 0
+          : action === 'last' ? settings.rules.length - 1
+          : index + (action === 'up' ? -1 : 1);
+        settings.rules.splice(index, 1);
+        settings.rules.splice(to, 0, rule);
       }
       changed(); render();
+      if (action !== 'delete') {
+        const movedCard = $('#rules').children[settings.rules.indexOf(rule)];
+        movedCard.scrollIntoView({ behavior: 'instant', block: 'center' });
+        movedCard.querySelector('[data-field=groupName]').focus({ preventScroll: true });
+      }
     });
     function renderFilters() {
       const container = card.querySelector('.filters');
@@ -139,9 +169,14 @@ async function save() {
 async function run(action) {
   try { await action(); } catch (error) { status(error.message, true); }
 }
+document.addEventListener('click', event => {
+  for (const menu of document.querySelectorAll('.rule-actions[open]')) {
+    if (!menu.contains(event.target)) menu.open = false;
+  }
+});
 $('#add').addEventListener('click', () => addRule());
 $('#example').addEventListener('click', () => addRule(true));
-for (const key of ['enabled', 'respectManual']) $(`#${key}`).addEventListener('change', event => {
+for (const key of ['enabled', 'respectManual', 'orderGroups']) $(`#${key}`).addEventListener('change', event => {
   settings[key] = event.target.checked; changed();
 });
 $('#save').addEventListener('click', () => run(save));
@@ -158,7 +193,9 @@ $('#apply').addEventListener('click', () => run(async () => {
     status(`Done · ${counts.grouped || 0} grouped · ${counts.ungrouped || 0} ungrouped · ${counts.unchanged || 0} already in place · ${counts.protected || 0} protected · ${counts.failed || 0} failed`, Boolean(counts.failed));
   } finally { $('#apply').disabled = false; }
 }));
+const urlAutocomplete = setupUrlSuggestions($('#test-url'), $('#url-suggestions'), isExtension);
 function testUrl() {
+  urlAutocomplete.close();
   clearRuleHighlight();
   clearNoMatchHighlight();
   const output = $('#test-result');
@@ -167,6 +204,7 @@ function testUrl() {
     validateSettings(settings);
     const url = $('#test-url').value.trim();
     if (!isWebUrl(url)) throw new Error('Enter a complete http:// or https:// URL.');
+    urlAutocomplete.remember(url);
     const rule = findRule(settings.rules, url);
     const filterIndex = rule ? rule.filters.findIndex(filter => compileFilter(filter)(url)) : -1;
     output.textContent = rule ? `Rule ${settings.rules.indexOf(rule) + 1} → ${rule.groupName} · Filter ${filterIndex + 1}${settings.enabled ? '' : ' (grouping is paused)'}` : !settings.enabled || settings.respectManual ? 'No matching rule. This tab would be left as it is.' : 'No matching rule. This tab would leave its group.';
@@ -184,7 +222,7 @@ $('#test-url').addEventListener('input', () => {
   output.textContent = 'Testing a URL jumps to the first matching rule.';
   output.classList.remove('error');
 });
-$('#test-url').addEventListener('keydown', event => { if (event.key === 'Enter') testUrl(); });
+$('#test-url').addEventListener('keydown', event => { if (event.key === 'Enter' && !event.defaultPrevented) testUrl(); });
 $('#export').addEventListener('click', () => run(async () => {
   validateSettings(settings);
   const url = URL.createObjectURL(new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' }));

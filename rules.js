@@ -1,5 +1,5 @@
 export const COLORS = ['grey', 'blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan', 'orange'];
-export const DEFAULT_SETTINGS = { enabled: true, respectManual: true, rules: [] };
+export const DEFAULT_SETTINGS = { enabled: true, respectManual: true, orderGroups: false, rules: [] };
 
 export function compileRule(rule) {
   const filters = rule.filters === undefined ? [{ type: rule.type, pattern: rule.pattern }] : rule.filters;
@@ -41,6 +41,7 @@ export function validateSettings(settings) {
   if (!settings || typeof settings.enabled !== 'boolean' || typeof settings.respectManual !== 'boolean' || !Array.isArray(settings.rules)) {
     throw new Error('Invalid settings file.');
   }
+  if (settings.orderGroups !== undefined && typeof settings.orderGroups !== 'boolean') throw new Error('Invalid group ordering setting.');
   const ids = new Set();
   for (const [index, rule] of settings.rules.entries()) {
     try {
@@ -62,6 +63,7 @@ export function normalizeSettings(settings) {
   validateSettings(settings);
   return {
     ...settings,
+    orderGroups: settings.orderGroups ?? false,
     rules: settings.rules.map(({ type, pattern, ...rule }) => ({
       ...rule,
       filters: (rule.filters ?? [{ type, pattern }]).map(filter => ({ ...filter }))

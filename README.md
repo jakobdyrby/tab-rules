@@ -68,3 +68,11 @@ For a visual editor preview, serve this folder with `python -m http.server 8765 
 This is a personal-use first version, not yet packaged for Chrome Web Store publication.
 
 Icons are generated locally with `./scripts/generate-icons.ps1` on Windows using System.Drawing. Reload the extension in Chrome after changing the manifest or icons.
+
+### Automatic group ordering
+
+Enable **Keep groups in rule order** and save to place groups named in enabled rules first in each window, after pinned tabs. It also runs after groups are created, renamed, or moved, and when applying rules. Unrelated tabs and groups retain their relative order, although their absolute positions shift. Exact group names are used; duplicate rule names use the first enabled occurrence. Duplicate group titles retain their relative order. Incognito windows are skipped. Automatic grouping pauses ordering too. Respect existing groups protects membership, not positions when ordering is enabled. Older settings and imports default this option to off.
+
+### Test URL autocomplete
+
+The tester suggests open HTTP/HTTPS tabs (excluding incognito) and the last 20 distinct tested URLs. Type part of a URL or tab title; use arrow keys and Enter to choose, then Enter again to test. Escape dismisses suggestions. Recent test URLs are stored locally, separately from exported rules. The browser preview only suggests recent tests; open tabs are available in the installed extension. No history permission is requested.

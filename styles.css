@@ -94,3 +94,45 @@
     transition: none;
   }
 }
+
+@media (max-width: 580px) {
+  .rule-top { flex-wrap: wrap; gap: 10px; }
+  .rule-actions button { padding: 4px 8px; }
+}
+.rule-actions button[data-action=first],
+.rule-actions button[data-action=last] { font-size: 12px; white-space: nowrap; }
+
+.rule-actions { position: relative; display: block; }
+.rule-actions summary {
+  display: grid; place-items: center; width: 34px; height: 32px;
+  border: 1px solid transparent; border-radius: 7px; color: #69776e;
+  cursor: pointer; list-style: none;
+}
+.rule-actions summary::-webkit-details-marker { display: none; }
+.rule-actions summary:hover, .rule-actions[open] summary { background: #edf1e9; border-color: #dde3d9; color: #233a32; }
+.rule-menu {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 4;
+  width: 190px; padding: 6px; background: #fff; border: 1px solid #dde3d9;
+  border-radius: 10px; box-shadow: 0 8px 28px #233a3224;
+}
+.rule-actions .rule-menu button {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  border: none; padding: 9px 10px; border-radius: 5px;
+  text-align: left; font-size: 13px; font-weight: 400; white-space: nowrap;
+}
+.rule-menu button span { width: 18px; text-align: center; font-size: 17px; color: #78867d; }
+.rule-actions .rule-menu button[data-action=delete], .rule-menu button[data-action=delete] span { color: #aa3e3e; }
+.rule-actions .rule-menu button[data-action=delete]:hover { background: #fff0f0; }
+.rule-menu .menu-divider { height: 1px; margin: 5px 6px; background: #edf0e9; }
+
+.settings { flex-wrap: wrap; gap: 24px; }
+.settings .setting { flex: 1 1 260px; }
+
+.url-combobox { position: relative; flex: 1; min-width: 0; }
+#url-suggestions { position: absolute; top: calc(100% + 5px); left: 0; right: 0; z-index: 5; list-style: none; margin: 0; padding: 5px; max-height: 260px; overflow: auto; background: #fff; border: 1px solid #d5ddd1; border-radius: 8px; box-shadow: 0 8px 24px #233a3224; }
+#url-suggestions li { padding: 9px 10px; border-radius: 5px; cursor: pointer; }
+#url-suggestions li:hover, #url-suggestions li[aria-selected=true] { background: #edf3e9; }
+.suggestion-heading { display: flex; align-items: baseline; gap: 12px; font-size: 13px; color: #304c3c; }
+.suggestion-heading > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.suggestion-heading small { margin-left: auto; flex-shrink: 0; color: #6f7b70; font-size: 10px; }
+.suggestion-url { display: block; color: #737e77; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; }
