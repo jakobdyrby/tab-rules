@@ -51,7 +51,7 @@ Follow steps 3–4 above, selecting the **extension/** folder. No build or depen
 | --- | --- | --- |
 | Domain | `github.com` | The hostname and its subdomains |
 | URL wildcard | `https://github.com/example-org/*` | A specific organization or route |
-| Regex | `^https://(?:dev\.|staging\.)?example\.com/` | Several related hostnames |
+| Regex | `^https://(?:dev\.\|staging\.)?example\.com/` | Several related hostnames |
 
 Put specific rules above broader ones using the rule’s **⋯** menu. Add multiple filters to send different sites to the same group.
 
