@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createOrganizer } from '../organizer.js';
+import { createOrganizer } from '../extension/organizer.js';
 
 function fixture() {
   const settings = { enabled: true, respectManual: true, rules: [
@@ -49,11 +49,11 @@ test('reuses a named group but keeps separate groups per window', async () => {
 test('different filters in one rule place tabs in the same group', async () => {
   const f = fixture();
   f.settings.rules = [{ id: 'elk', enabled: true, groupName: 'Elk', color: 'blue', filters: [
-    { type: 'wildcard', pattern: 'https://elk.int.copopt.dev*' },
-    { type: 'wildcard', pattern: 'https://elk.kube.betterairport.*' }
+    { type: 'wildcard', pattern: 'https://logs.internal.example.com*' },
+    { type: 'wildcard', pattern: 'https://logs.cluster.example.*' }
   ] }];
-  f.add(1, { url: 'https://elk.int.copopt.dev/app' });
-  f.add(2, { url: 'https://elk.kube.betterairport.eu/app' });
+  f.add(1, { url: 'https://logs.internal.example.com/app' });
+  f.add(2, { url: 'https://logs.cluster.example.eu/app' });
   assert.deepEqual(await f.organizer.applyAll(), { grouped: 2 });
   assert.equal(f.groups.size, 1);
   assert.equal(f.groups.get(f.tabs.get(1).groupId).title, 'Elk');

@@ -1,5 +1,5 @@
 Add-Type -AssemblyName System.Drawing
-$iconDirectory = Join-Path $PSScriptRoot '../icons'
+$iconDirectory = Join-Path $PSScriptRoot '../extension/icons'
 New-Item -ItemType Directory -Force -Path $iconDirectory | Out-Null
 
 function Fill-RoundedRect($graphics, $hex, $x, $y, $width, $height, $radius) {

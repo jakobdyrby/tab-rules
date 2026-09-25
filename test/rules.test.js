@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { compileRule, findRule, normalizeSettings, validateSettings } from '../rules.js';
+import { compileRule, findRule, normalizeSettings, validateSettings } from '../extension/rules.js';
 
 const rule = (type, pattern, extra = {}) => ({ id: '1', enabled: true, groupName: 'Work', color: 'blue', type, pattern, ...extra });
 test('domain matches subdomains without matching lookalikes or path text', () => {
@@ -38,16 +38,16 @@ test('settings reject bad imports and disabled invalid patterns', () => {
 
 test('multiple filters use OR, preserve rule priority, and support mixed types', () => {
   const elk = rule('domain', 'unused.example', { filters: [
-    { type: 'wildcard', pattern: 'https://elk.int.copopt.dev*' },
-    { type: 'wildcard', pattern: 'https://elk.kube.betterairport.*' },
+    { type: 'wildcard', pattern: 'https://logs.internal.example.com*' },
+    { type: 'wildcard', pattern: 'https://logs.cluster.example.*' },
     { type: 'domain', pattern: 'logs.example.com' },
     { type: 'regex', pattern: '^https://other\\.example/test' }
   ] });
-  for (const url of ['https://elk.int.copopt.dev/', 'https://elk.kube.betterairport.eu/app', 'https://logs.example.com/', 'https://other.example/test']) {
+  for (const url of ['https://logs.internal.example.com/', 'https://logs.cluster.example.eu/app', 'https://logs.example.com/', 'https://other.example/test']) {
     assert.equal(findRule([elk, rule('wildcard', '*', { id: '2' })], url), elk);
   }
-  assert.equal(findRule([elk], 'https://headlamp.kube.betterairport.dev'), undefined);
-  assert.equal(findRule([{ ...elk, enabled: false }], 'https://elk.int.copopt.dev'), undefined);
+  assert.equal(findRule([elk], 'https://dashboard.cluster.example.com'), undefined);
+  assert.equal(findRule([{ ...elk, enabled: false }], 'https://logs.internal.example.com'), undefined);
 });
 
 test('all filters must be valid and at least one is required', () => {

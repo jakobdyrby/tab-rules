@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { suggestUrls, rememberUrl } from '../url-suggestions.js';
+import { suggestUrls, rememberUrl } from '../extension/url-suggestions.js';
 
 test('searches titles and URLs, deduplicates and prefers open tabs', () => {
   const tabs = [{url:'https://example.com/a', title:'My project'}, {url:'https://example.com/a',title:'Duplicate'}];

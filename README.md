@@ -1,78 +1,103 @@
-# Tab Rules
+<p align="center"><img src="extension/icons/icon-128.png" width="80" height="80" alt="Tab Rules icon"></p>
+<h1 align="center">Tab Rules</h1>
+<p align="center">A place for every tab. Organize native Chrome tab groups with URL rules.</p>
 
-A dependency-free Manifest V3 extension that organizes native Chrome tab groups using URL rules. All settings stay on your computer. No account, analytics, content scripts, or external requests.
+[![CI](https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/actions/workflows/ci.yml/badge.svg)](https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Try it in Chrome
+**Early beta · Chrome 112+ · No account, analytics, or backend.** Not yet published in the Chrome Web Store.
 
-1. Open `chrome://extensions` and turn on **Developer mode**.
-2. Select **Load unpacked** and choose this folder: `C:\work\tool-chrome-tab-group-organizer`.
-3. The rule editor opens on first install. You can reopen it from the extension toolbar icon or the extension's Options menu.
-4. Add a rule, e.g. **Domain** → `github.com` → group **Code** → **Blue**.
-5. Click **Save changes**, then open a matching URL. Use **Apply to open tabs** to save and organize existing tabs across all windows.
+![Illustration of the rule editor](docs/screenshots/editor-overview.svg)
+*Interface illustration. Actual appearance may vary.*
 
-No npm install or build is needed. After changing source files, click Reload on the extension's card and refresh the options page.
+## Features
 
-## Rules
+- Match domains, URL wildcards, or regular expressions.
+- Combine multiple filters in one group: any filter can match.
+- Set group names, colours, and priority; first matching rule wins.
+- Preserve existing groups, or let rules regroup tabs and ungroup unmatched tabs.
+- Optionally arrange Chrome groups in rule order within each window.
+- Test URLs with matching rule/filter highlights and autocomplete from open tabs and recent tests.
+- Import and export rules as JSON. All extension data stays on your device.
 
-Rules are evaluated in list order; the first enabled match wins. Each rule has one group name and one or more filters, combined with **OR**: any matching filter sends the tab to that group. Use **Add filter** within a rule to add another domain, wildcard, or regex; filter types can be mixed. Move more specific rules above broad domain rules. Several rules can also use the same group name.
+## Install
 
-For example, the **Elk** group can have two URL wildcard filters: `https://elk.int.copopt.dev*` and `https://elk.kube.betterairport.*`. Either matches the same group. Existing single-filter settings and exports load automatically in the new editor; saving/exporting uses a `filters` array per rule.
+### From a release
 
-| Type | Example | Behaviour |
-| --- | --- | --- |
-| Domain | `github.com` | Exact hostname and all subdomains; no protocol or path |
-| URL wildcard | `https://github.com/your-org/*` | Whole-URL match; `*` means any text |
-| Regular expression | `^https://dev\.azure\.com/(team-a\|team-b)/` | JavaScript regex without surrounding slashes or flags |
+1. Download `tab-rules-0.1.0.zip` from [Releases](https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/releases).
+2. Extract it to a permanent folder; keep it there while the extension is installed.
+3. Open `chrome://extensions` in Chrome and enable **Developer mode**.
+4. Select **Load unpacked** and choose the extracted folder containing `manifest.json`.
 
-Domain matching ignores case. Wildcard and regex matching are case-sensitive. Use simple, trusted regex patterns; JavaScript regexes can become expensive with nested repetition. The URL tester uses unsaved edits. Import replaces the editor's contents, but requires saving before it affects automatic grouping. Export includes current edits.
+### From source
 
-## Predictable grouping
-
-- Evaluates newly opened tabs, URL changes, completed loads, unpinning, and window moves, with a short debounce.
-- Reuses an open group with the exact same name in the tab's window. Never moves tabs between windows. If duplicate names exist, prefers the tab's current group, then the first group returned by Chrome.
-- Sets name and colour on newly created groups; preserves existing group colours and collapsed state.
-- Skips pinned tabs, incognito tabs, and URLs outside HTTP/HTTPS.
-- With **Respect existing groups** off, a web tab leaves its group when no rule matches, including when applying to open tabs. Removing or disabling a rule takes effect on subsequent tab activity or when applying rules. Pinned, incognito, and non-web tabs remain untouched.
-- With **Respect existing groups** (on by default), ungrouped tabs go to their matching group. Opening or navigating URLs inside any group keeps that group, including groups created by the extension. Applying to open tabs also preserves existing groups.
-- Ownership and manual overrides survive service-worker suspension using session storage. They reset when Chrome restarts or the extension reloads/updates. Existing groups remain protected; turn off group protection to let rules take over them.
-- Saved changes affect subsequent tab activity. Applying to open tabs also respects pause and manual protection.
-- Closed/saved groups are not reopened or synchronized by this extension.
-
-## Permissions
-
-`tabs` reads URLs and moves tabs into groups. `tabGroups` looks up and names groups. `storage` saves rules locally and tracks ownership for the browser session. No host permissions are requested. The extension uses Chrome's [tabs](https://developer.chrome.com/docs/extensions/reference/api/tabs), [tabGroups](https://developer.chrome.com/docs/extensions/reference/api/tabGroups), and [storage](https://developer.chrome.com/docs/extensions/reference/api/storage) APIs.
-
-## Development and verification
-
-Use Node 22+:
-
-```powershell
-npm test
-npm run check
+```sh
+git clone https://github.com/jakobdyrby/tool-chrome-tab-group-organizer.git
+cd tool-chrome-tab-group-organizer
 ```
 
-Tests cover matching, validation, priority, per-window group reuse, manual protection, pause, worker recreation, and tab-operation failures using a Chrome API fake. They do not replace testing the unpacked extension in Chrome.
+Follow steps 3–4 above, selecting the **extension/** folder. No build or dependency installation is required.
 
-For a visual editor preview, serve this folder with `python -m http.server 8765 --bind 127.0.0.1`, then visit `http://127.0.0.1:8765/options.html`. Preview settings use separate local browser storage; the preview cannot organize real tabs.
+**Upgrading from the old repository layout:** export your rules before removing the old unpacked installation. Load `extension/` and import them into the new installation. Changing the unpacked folder can change its extension ID and storage. Once using `extension/`, update the files and click **Reload** on its Chrome extension card.
 
-### Chrome smoke test
+## Quick start
 
-1. Save two rules (GitHub → Code, ChatGPT → AI); open two GitHub tabs and confirm one Code group.
-2. Open GitHub in another window and confirm that window gets its own group.
-3. Navigate a Code tab to ChatGPT, or open ChatGPT inside Code, and confirm it stays in Code. Open ChatGPT in an ungrouped tab and confirm it goes to AI.
-4. Manually ungroup that tab; navigate again and confirm it stays ungrouped with manual protection on.
-5. Pin a matching tab and confirm applying rules does not move it.
-6. Pause grouping, save, and confirm new tabs stay put.
-7. Reload the extension and confirm existing groups remain protected.
+1. Open the editor from the extension toolbar icon.
+2. Add a **Domain** filter for `github.com`, group name **Code**, and a colour.
+3. Save and open a matching URL in an ungrouped tab.
+4. Use **Apply to open tabs** to organize existing tabs.
 
-This is a personal-use first version, not yet packaged for Chrome Web Store publication.
+| Match type | Example | Use |
+| --- | --- | --- |
+| Domain | `github.com` | The hostname and its subdomains |
+| URL wildcard | `https://github.com/example-org/*` | A specific organization or route |
+| Regex | `^https://(?:dev\.|staging\.)?example\.com/` | Several related hostnames |
 
-Icons are generated locally with `./scripts/generate-icons.ps1` on Windows using System.Drawing. Reload the extension in Chrome after changing the manifest or icons.
+Put specific rules above broader ones using the rule’s **⋯** menu. Add multiple filters to send different sites to the same group.
 
-### Automatic group ordering
+Read the [behaviour guide](docs/behaviour.md) for group protection, automatic ordering, matching details, and limitations.
 
-Enable **Keep groups in rule order** and save to place groups named in enabled rules first in each window, after pinned tabs. It also runs after groups are created, renamed, or moved, and when applying rules. Unrelated tabs and groups retain their relative order, although their absolute positions shift. Exact group names are used; duplicate rule names use the first enabled occurrence. Duplicate group titles retain their relative order. Incognito windows are skipped. Automatic grouping pauses ordering too. Respect existing groups protects membership, not positions when ordering is enabled. Older settings and imports default this option to off.
+## Privacy and permissions
 
-### Test URL autocomplete
+Tab Rules reads tab URLs and titles locally, stores rules and up to 20 recent test URLs, and makes no external requests. It does not read page contents or request browser-history permission. See the [privacy policy](docs/privacy.md) for storage, removal, and permission details.
 
-The tester suggests open HTTP/HTTPS tabs (excluding incognito) and the last 20 distinct tested URLs. Type part of a URL or tab title; use arrow keys and Enter to choose, then Enter again to test. Escape dismisses suggestions. Recent test URLs are stored locally, separately from exported rules. The browser preview only suggests recent tests; open tabs are available in the installed extension. No history permission is requested.
+## Development
+
+Use Node.js 22 or later. No npm dependencies are required.
+
+```sh
+npm test
+npm run check
+npm run package
+```
+
+The package command writes `dist/tab-rules-0.1.0.zip`, containing only runtime files with `manifest.json` at its root.
+
+For an editor-only preview:
+
+```sh
+python -m http.server 8765 --bind 127.0.0.1 --directory extension
+```
+
+Visit `http://127.0.0.1:8765/options.html`. The preview has separate local storage and cannot organize Chrome tabs. Open-tab autocomplete requires the installed extension.
+
+```text
+extension/          Load this folder into Chrome
+  icons/            Extension and toolbar icons
+docs/               Behaviour, privacy, testing, and release guides
+scripts/            Validation, packaging, and icon generation
+test/               Node tests with simulated Chrome APIs
+.github/workflows/  Automated checks and release artifacts
+```
+
+## Contributing and support
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Report problems through [GitHub Issues](https://github.com/jakobdyrby/tool-chrome-tab-group-organizer/issues), using sanitized URLs and patterns. Please do not upload browsing history, credentials, or private rule exports.
+
+## Release status
+
+This is an early beta. Automated tests cover core logic; broad live Chrome testing is still in progress. See the [manual test checklist](docs/testing.md), [changelog](CHANGELOG.md), and [release guide](docs/releasing.md).
+
+## License
+
+[MIT](LICENSE) © 2026 Jakob Dyrby.

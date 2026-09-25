@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { orderGroups } from '../group-order.js';
-import { normalizeSettings, validateSettings } from '../rules.js';
+import { orderGroups } from '../extension/group-order.js';
+import { normalizeSettings, validateSettings } from '../extension/rules.js';
 
 function fixture() {
   const settings = { enabled: true, respectManual: true, orderGroups: true, rules: [
