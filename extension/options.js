@@ -1,10 +1,11 @@
+import { api } from './browser-api.js';
 import { setupUrlSuggestions } from './url-suggestions.js';
 import { COLORS, DEFAULT_SETTINGS, compileFilter, findRule, isWebUrl, normalizeSettings, validateSettings } from './rules.js';
 
 const $ = selector => document.querySelector(selector);
 const palette = { grey: '#88938c', blue: '#739fe8', red: '#e98080', yellow: '#eac562', green: '#73ac80', pink: '#e49bbe', purple: '#aa91d9', cyan: '#68bdc3', orange: '#e7a568' };
-const isExtension = Boolean(globalThis.chrome?.storage?.local);
-const storage = isExtension ? chrome.storage.local : {
+const isExtension = Boolean(api?.storage?.local);
+const storage = isExtension ? api.storage.local : {
   async get() { return { settings: JSON.parse(localStorage.getItem('tab-rules-preview') || 'null') || undefined }; },
   async set({ settings }) { localStorage.setItem('tab-rules-preview', JSON.stringify(settings)); }
 };
@@ -193,11 +194,11 @@ $('#test-now').addEventListener('click', () => {
 $('#save').addEventListener('click', () => run(save));
 $('#apply').addEventListener('click', () => run(async () => {
   await save();
-  if (!isExtension) { status('Preview only · Load this folder as a Chrome extension to organize tabs.'); return; }
+  if (!isExtension) { status('Preview only · Install Tab Rules in Chrome or Firefox to organize tabs.'); return; }
   $('#apply').disabled = true;
   status('Organizing open tabs…');
   try {
-    const result = await chrome.runtime.sendMessage({ type: 'apply' });
+    const result = await api.runtime.sendMessage({ type: 'apply' });
     if (!result?.ok) throw new Error(result?.error || 'The extension did not respond. Try reloading it.');
     const counts = result.counts;
     status(`Done · ${counts.grouped || 0} grouped · ${counts.recoloured || 0} recoloured · ${counts.ungrouped || 0} ungrouped · ${counts.unchanged || 0} already in place · ${counts.protected || 0} protected · ${counts.failed || 0} failed`, Boolean(counts.failed));

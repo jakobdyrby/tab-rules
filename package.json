@@ -2,7 +2,7 @@
   "name": "tab-rules",
   "version": "0.1.0",
   "private": true,
-  "description": "URL-based automatic tab groups for Chrome",
+  "description": "URL-based automatic tab groups for Chrome and Firefox",
   "license": "MIT",
   "type": "module",
   "engines": {

@@ -6,17 +6,19 @@ Only HTTP/HTTPS URLs are matched. Pinned and incognito tabs are skipped. Enabled
 
 Domain filters match the exact hostname and subdomains, ignoring case. Wildcards match the whole URL: `*` is any text, with all other characters literal. Regex filters use JavaScript regular expressions without surrounding slashes or flags. Wildcard and regex matching are case-sensitive. Keep regexes simple: nested repetition can cause expensive matching. Regex execution is not currently time-limited.
 
-The extension checks newly opened tabs, URL changes, completed loads, unpinning, and window moves, with a short debounce. It uses a pending navigation URL when available.
+The extension checks newly opened tabs, URL changes, completed loads, unpinning, and window moves, with a short debounce. It uses a pending navigation URL when available; Firefox uses the tab's current URL.
+
+Chrome 112+ and Firefox Desktop 139+ use the same native tab-group behavior and rule format. Firefox containers are independent of tab groups: grouping preserves a tab's container and does not reopen the page or change its cookies or login session.
 
 ## Groups and manual choices
 
-Groups are reused by exact name within the same window; tabs are never moved between windows. Newly created groups receive the rule’s colour. Automatic grouping preserves existing group colours. Manual Apply rules (including the editor’s Apply to open tabs) and Regroup all tabs refresh named groups to the first enabled rule’s colour, even with group protection on. Groups without eligible web tabs are skipped. Collapsed state is preserved. Order groups only changes positions. If several groups share a name, the current group is preferred, then the first returned by Chrome.
+Groups are reused by exact name within the same window; tabs are never moved between windows. Newly created groups receive the rule’s colour. Automatic grouping preserves existing group colours. Manual Apply rules (including the editor’s Apply to open tabs) and Regroup all tabs refresh named groups to the first enabled rule’s colour, even with group protection on. Groups without eligible web tabs are skipped. Collapsed state is preserved. Order groups only changes positions. If several groups share a name, the current group is preferred, then the first returned by the browser.
 
 **Respect existing groups**, on by default, keeps a tab in any existing group even when another rule matches. This includes groups created by the extension. Manually ungrouped tabs stay ungrouped for the browser session.
 
 With protection off, matching tabs move to their rule’s group and unmatched web tabs leave their group. Pausing automatic grouping also pauses ungrouping and ordering.
 
-Membership tracking survives service-worker suspension but resets on browser restart, extension reload, or update. Existing groups remain protected. Closed/saved groups are not reopened or synchronized.
+Membership tracking survives background suspension (Chrome service worker / Firefox event page) but resets on browser restart, extension reload, or update. Existing groups remain protected. Closed/saved groups are not reopened or synchronized.
 
 ## Group ordering
 
@@ -34,7 +36,7 @@ Import replaces the editor contents and requires saving. Export includes current
 
 ## Early-beta limitations
 
-Tests simulate Chrome APIs; event races, restored sessions, active tab dragging, and platform-specific behaviour still need wider live testing. Some transient tab operations can fail while Chrome is rearranging tabs; reapply after the operation completes. Multiple editor tabs can overwrite each other’s settings. Do not use complex or untrusted regex patterns.
+Tests simulate browser APIs; event races, restored sessions, active tab dragging, and platform-specific behaviour still need wider live testing. Some transient tab operations can fail while the browser is rearranging tabs; reapply after the operation completes. Multiple editor tabs can overwrite each other’s settings. Do not use complex or untrusted regex patterns.
 
 ## Manual toolbar actions
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Firefox Desktop 139+ support using native tab groups, with a shared browser API layer, Firefox packaging, and installation instructions.
+
 - Replace per-rule Test now buttons with a single action in the sticky bottom bar.
 
 - Show a persistent unsaved indicator, highlighted save bar and Save button, and browser-tab marker while editing.
