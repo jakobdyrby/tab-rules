@@ -4,7 +4,7 @@ Bug reports, documentation fixes, and focused pull requests are welcome.
 
 ## Setup
 
-Use Node.js 22+, clone the repository, and load `extension/` as an unpacked Chrome extension. No dependency installation is needed.
+Use Node.js 22+ and clone the repository. Load `extension/` as an unpacked Chrome extension, or run `npm run package` and temporarily load `dist/firefox/manifest.json` in Firefox Desktop 139+ through `about:debugging`. No dependency installation is needed. Edit `extension/`, then rebuild and reload when testing Firefox.
 
 Before opening a pull request:
 
@@ -14,7 +14,7 @@ npm run check
 npm run package
 ```
 
-Run relevant checks in [the Chrome checklist](docs/testing.md), especially for changes involving tab events. Automated tests use simulated APIs and cannot fully reproduce Chrome timing.
+Run relevant checks in [the browser checklist](docs/testing.md), especially for changes involving tab events. Automated tests use simulated APIs and cannot fully reproduce browser timing.
 
 ## Changes
 
@@ -27,6 +27,6 @@ Run relevant checks in [the Chrome checklist](docs/testing.md), especially for c
 
 ## Reporting bugs
 
-Include Chrome and OS versions, steps to reproduce, expected behaviour, and a minimal sanitized rule. Describe whether automatic grouping, group protection, and group ordering are enabled. Never include real private URLs, tokens, or full personal exports.
+Include browser and OS versions, steps to reproduce, expected behaviour, and a minimal sanitized rule. Describe whether automatic grouping, group protection, and group ordering are enabled. Never include real private URLs, tokens, or full personal exports.
 
 For security issues, use GitHub’s private vulnerability reporting if available. Avoid posting exploit details or sensitive data in a public issue.

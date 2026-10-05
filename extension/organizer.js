@@ -1,6 +1,6 @@
 import { DEFAULT_SETTINGS, findRule, isWebUrl } from './rules.js';
 
-// All callers are serialized by the service worker, including membership events.
+// All callers are serialized by the background script, including membership events.
 export function createOrganizer(api) {
   async function organize(tabId, settingsOverride) {
     const settings = settingsOverride ?? (await api.storage.local.get('settings')).settings ?? DEFAULT_SETTINGS;
@@ -32,7 +32,7 @@ export function createOrganizer(api) {
     const groupId = await api.tabs.group(group
       ? { tabIds: [tabId], groupId: group.id }
       : { tabIds: [tabId], createProperties: { windowId: tab.windowId } });
-    // Persist ownership before queued Chrome membership events are processed.
+    // Persist ownership before queued browser membership events are processed.
     await api.storage.session.set({ [key]: { groupId, manual: false } });
     if (!group) await api.tabGroups.update(groupId, { title: name, color: rule.color });
     return 'grouped';

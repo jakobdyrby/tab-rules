@@ -1,3 +1,4 @@
+import { api } from './browser-api.js';
 import { isWebUrl } from './rules.js';
 
 export function suggestUrls(tabs, recent, query) {
@@ -31,7 +32,7 @@ export function setupUrlSuggestions(input, list, extension) {
   let saves = Promise.resolve();
   const readRecent = async () => {
     const value = extension
-      ? (await chrome.storage.local.get('recentTestUrls')).recentTestUrls
+      ? (await api.storage.local.get('recentTestUrls')).recentTestUrls
       : JSON.parse(localStorage.getItem('tab-rules-recent-tests') || '[]');
     return Array.isArray(value) ? value.filter(isWebUrl).slice(0, 20) : [];
   };
@@ -82,7 +83,7 @@ export function setupUrlSuggestions(input, list, extension) {
     const current = ++generation;
     await ready;
     if (extension) {
-      try { tabs = await chrome.tabs.query({}); } catch { tabs = []; }
+      try { tabs = await api.tabs.query({}); } catch { tabs = []; }
     }
     if (current === generation && document.activeElement === input) render();
   });
@@ -110,7 +111,7 @@ export function setupUrlSuggestions(input, list, extension) {
       saves = saves.then(async () => {
         await ready;
         recent = rememberUrl(await readRecent(), url);
-        if (extension) await chrome.storage.local.set({ recentTestUrls: recent });
+        if (extension) await api.storage.local.set({ recentTestUrls: recent });
         else localStorage.setItem('tab-rules-recent-tests', JSON.stringify(recent));
       }).catch(error => console.warn('Could not save recent test URL:', error.message));
     }
