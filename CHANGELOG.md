@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.2.0 beta — 2026-11-06
+
+- Serialize grouping transactions per window, recheck before creating a native group, and reevaluate tabs changed during lookup. Preserve manual membership and existing duplicate groups.
+- Add concurrency and Chrome event regression coverage, including delayed group naming, redirects, window moves, replacement, and worker-state protection.
+
 - Add Firefox Desktop 139+ support using native tab groups, with a shared browser API layer, Firefox packaging, and installation instructions.
 
 - Replace per-rule Test now buttons with a single action in the sticky bottom bar.

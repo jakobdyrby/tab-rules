@@ -14,6 +14,8 @@ Chrome 112+ and Firefox Desktop 139+ use the same native tab-group behavior and 
 
 Groups are reused by exact name within the same window; tabs are never moved between windows. Newly created groups receive the rule’s colour. Automatic grouping preserves existing group colours. Manual Apply rules (including the editor’s Apply to open tabs) and Regroup all tabs refresh named groups to the first enabled rule’s colour, even with group protection on. Groups without eligible web tabs are skipped. Collapsed state is preserved. Order groups only changes positions. If several groups share a name, the current group is preferred, then the first returned by the browser.
 
+Group lookup, creation, assignment, and naming are serialized per window inside the organizer. Each operation queries current groups after earlier operations finish and rechecks an absent group before creating it. Browser changes to the tab during lookup cause a fresh evaluation. The background queue also orders membership tracking and manual actions. This does not prevent Chrome, a user, or another extension from independently creating same-name groups. Existing duplicates are left separate: names alone do not establish ownership or permission to merge them.
+
 **Respect existing groups**, on by default, keeps a tab in any existing group even when another rule matches. This includes groups created by the extension. Manually ungrouped tabs stay ungrouped for the browser session.
 
 With protection off, matching tabs move to their rule’s group and unmatched web tabs leave their group. Pausing automatic grouping also pauses ungrouping and ordering.

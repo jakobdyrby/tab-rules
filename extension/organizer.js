@@ -1,13 +1,38 @@
 import { DEFAULT_SETTINGS, findRule, isWebUrl } from './rules.js';
 
-// All callers are serialized by the background script, including membership events.
+// The background queue also serializes membership events with our session writes.
 export function createOrganizer(api) {
+  const windows = new Map();
+  const retry = Symbol('tab changed');
   async function organize(tabId, settingsOverride) {
     const settings = settingsOverride ?? (await api.storage.local.get('settings')).settings ?? DEFAULT_SETTINGS;
     if (!settings.enabled) return 'paused';
+    // Own the find/create/assign transaction here, including naming the new group.
+    // Look up groups only after earlier work in this window has finished.
+    for (;;) {
+      let tab;
+      try { tab = await api.tabs.get(tabId); }
+      catch { return 'closed'; }
+      const windowId = tab.windowId;
+      const previous = windows.get(windowId) ?? Promise.resolve();
+      const result = previous.catch(() => {}).then(() => organizeInWindow(tabId, settings, windowId));
+      windows.set(windowId, result);
+      try {
+        const outcome = await result;
+        if (outcome !== retry) return outcome;
+      } finally {
+        if (windows.get(windowId) === result) windows.delete(windowId);
+      }
+      // A browser move/navigation during an API await invalidates the snapshot.
+      // Release this window before retrying, possibly in a different window.
+    }
+  }
+
+  async function organizeInWindow(tabId, settings, windowId) {
     let tab;
     try { tab = await api.tabs.get(tabId); }
     catch { return 'closed'; }
+    if (tab.windowId !== windowId) return retry;
     if (tab.pinned || tab.incognito) return 'skipped';
     const key = `tab:${tabId}`;
     const state = (await api.storage.session.get(key))[key];
@@ -26,8 +51,20 @@ export function createOrganizer(api) {
     }
     const groups = await api.tabGroups.query({ windowId: tab.windowId });
     const name = rule.groupName.trim();
-    const group = groups.find(group => group.id === tab.groupId && group.title === name)
+    let group = groups.find(group => group.id === tab.groupId && group.title === name)
       || groups.find(group => group.title === name);
+    // Another browser actor may have created/restored a group since the first
+    // lookup. Query once more before creating; never cache absence.
+    if (!group) {
+      const current = await api.tabGroups.query({ windowId });
+      group = current.find(group => group.title === name);
+    }
+    // Browser/user changes are outside our queue. Re-evaluate if the tab
+    // changed during either group lookup before assigning membership.
+    let latest;
+    try { latest = await api.tabs.get(tabId); }
+    catch { return 'closed'; }
+    if (['windowId', 'groupId', 'url', 'pendingUrl', 'pinned', 'incognito'].some(field => latest[field] !== tab[field])) return retry;
     if (group?.id === tab.groupId) return 'unchanged';
     const groupId = await api.tabs.group(group
       ? { tabIds: [tabId], groupId: group.id }

@@ -195,3 +195,141 @@ test('manual apply refreshes protected group colours across windows using first 
   assert.equal((await runManualAction(f.api, f.organizer, 'regroup')).recoloured, 2);
   assert.equal(f.groups.get(42).color, 'purple');
 });
+
+test('concurrent matching tabs share one fully named group per window', async () => {
+  const f = fixture();
+  for (let id = 1; id <= 12; id++) f.add(id, { windowId: id <= 8 ? 1 : 2 });
+  await Promise.all([...f.tabs.keys()].map(id => f.organizer.organize(id)));
+  assert.equal(f.groups.size, 2);
+  for (const windowId of [1, 2]) {
+    const members = [...f.tabs.values()].filter(tab => tab.windowId === windowId);
+    assert.equal(new Set(members.map(tab => tab.groupId)).size, 1);
+    assert.equal(f.groups.get(members[0].groupId).title, 'Code');
+  }
+});
+
+test('bulk apply overlapping individual navigation reuses the same group', async () => {
+  const f = fixture();
+  f.add(1); f.add(2); f.add(3);
+  await Promise.all([f.organizer.applyAll(), f.organizer.organize(2), f.organizer.organize(3)]);
+  assert.equal(f.groups.size, 1);
+  assert.equal(new Set([...f.tabs.values()].map(tab => tab.groupId)).size, 1);
+});
+
+test('existing duplicate names retain membership, colours, and collapsed state', async () => {
+  const f = fixture();
+  for (const id of [42, 43]) {
+    f.groups.set(id, { id, windowId: 1, title: 'Code', color: 'pink', collapsed: true });
+    f.add(id, { groupId: id });
+  }
+  f.add(1);
+  await f.organizer.applyAll();
+  assert.equal(f.tabs.get(1).groupId, 42);
+  assert.equal(f.tabs.get(43).groupId, 43);
+  f.settings.respectManual = false;
+  await f.organizer.applyAll();
+  assert.equal(f.tabs.get(43).groupId, 43);
+  assert.equal(f.groups.size, 2);
+  for (const group of f.groups.values()) {
+    assert.equal(group.color, 'pink');
+    assert.equal(group.collapsed, true);
+  }
+});
+
+test('a delayed group title blocks same-window creation but not another window', async () => {
+  const f = fixture(); f.add(1); f.add(2); f.add(3, { windowId: 2 });
+  let release, entered;
+  const gate = new Promise(resolve => { release = resolve; });
+  const started = new Promise(resolve => { entered = resolve; });
+  const update = f.api.tabGroups.update;
+  f.api.tabGroups.update = async (id, values) => {
+    if (f.groups.get(id).windowId === 1) { entered(); await gate; }
+    return update(id, values);
+  };
+  const first = f.organizer.organize(1);
+  await started;
+  const second = f.organizer.organize(2);
+  try {
+    assert.equal(await f.organizer.organize(3), 'grouped');
+    assert.equal(f.groups.size, 2, 'one group in each window while the first title is pending');
+    assert.equal(f.tabs.get(2).groupId, -1);
+  } finally { release(); }
+  await Promise.all([first, second]);
+  assert.equal(f.groups.size, 2);
+  assert.equal(f.tabs.get(1).groupId, f.tabs.get(2).groupId);
+});
+
+test('a rejected transaction releases the window queue', async () => {
+  const f = fixture(); f.add(1); f.add(2);
+  const group = f.api.tabs.group;
+  f.api.tabs.group = async args => {
+    if (args.tabIds[0] === 1) throw new Error('Tab is being dragged');
+    return group(args);
+  };
+  const results = await Promise.allSettled([f.organizer.organize(1), f.organizer.organize(2)]);
+  assert.equal(results[0].status, 'rejected');
+  assert.equal(results[1].value, 'grouped');
+  assert.equal(f.groups.size, 1);
+});
+
+test('window moves and redirects during lookup retry against the current tab', async () => {
+  const f = fixture(); f.add(1); f.add(2, { windowId: 2, url: 'https://chatgpt.com/' });
+  await f.organizer.organize(2);
+  const query = f.api.tabGroups.query;
+  let moved = false;
+  f.api.tabGroups.query = async args => {
+    const groups = await query(args);
+    if (!moved && args.windowId === 1) {
+      moved = true;
+      Object.assign(f.tabs.get(1), { windowId: 2, pendingUrl: 'https://chatgpt.com/redirect' });
+    }
+    return groups;
+  };
+  assert.equal(await f.organizer.organize(1), 'grouped');
+  assert.equal(f.groups.size, 1);
+  assert.equal(f.tabs.get(1).groupId, f.tabs.get(2).groupId);
+});
+
+test('manual membership changes during lookup remain protected', async () => {
+  const f = fixture(); f.add(1);
+  f.groups.set(42, { id: 42, windowId: 1, title: 'Manual', color: 'pink' });
+  const query = f.api.tabGroups.query;
+  f.api.tabGroups.query = async args => {
+    f.tabs.get(1).groupId = 42;
+    return query(args);
+  };
+  assert.equal(await f.organizer.organize(1), 'protected');
+  assert.equal(f.tabs.get(1).groupId, 42);
+  assert.equal(f.groups.size, 1);
+});
+
+test('concurrent matches preserve first-rule priority and trimmed group identity', async () => {
+  const f = fixture(); f.add(1); f.add(2, { url: 'https://chatgpt.com/' });
+  f.settings.rules[0].groupName = ' Code ';
+  f.settings.rules[1].groupName = 'Code';
+  f.settings.rules.push({ ...f.settings.rules[0], id: 'later', groupName: 'Wrong', color: 'red' });
+  await Promise.all([f.organizer.organize(1), f.organizer.organize(2)]);
+  assert.equal(f.groups.size, 1);
+  assert.equal(f.tabs.get(1).groupId, f.tabs.get(2).groupId);
+  assert.equal(f.groups.get(f.tabs.get(1).groupId).title, 'Code');
+  assert.equal(f.groups.get(f.tabs.get(1).groupId).color, 'blue');
+});
+
+test('rechecks an absent group before creation when a browser actor adds one', async () => {
+  const f = fixture(); f.add(1);
+  const query = f.api.tabGroups.query;
+  let first = true;
+  f.api.tabGroups.query = async args => {
+    const snapshot = await query(args);
+    if (first) {
+      first = false;
+      f.groups.set(42, { id: 42, windowId: 1, title: 'Code', color: 'pink' });
+      f.add(42, { groupId: 42, url: 'https://unmatched.test/' });
+    }
+    return snapshot;
+  };
+  assert.equal(await f.organizer.organize(1), 'grouped');
+  assert.equal(f.tabs.get(1).groupId, 42);
+  assert.equal(f.groups.size, 1);
+  assert.equal(f.groups.get(42).color, 'pink');
+});
