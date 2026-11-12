@@ -129,9 +129,17 @@ function render() {
         const pattern = row.querySelector('[data-filter=pattern]');
         pattern.placeholder = placeholders[filter.type];
         for (const input of row.querySelectorAll('[data-filter]')) {
-          input.value = filter[input.dataset.filter];
+          const field = input.dataset.filter;
+          input.value = field === 'type' && filter.type !== 'domain' && filter.ignoreCase
+            ? filter.type + '-ignore-case'
+            : filter[field];
           input.addEventListener('input', () => {
-            filter[input.dataset.filter] = input.value;
+            if (field === 'type') {
+              filter.type = input.value.replace('-ignore-case', '');
+              filter.ignoreCase = input.value.endsWith('-ignore-case');
+            } else {
+              filter[field] = input.value;
+            }
             pattern.placeholder = placeholders[filter.type];
             changed();
           });

@@ -15,6 +15,7 @@ Run this checklist separately in Chrome 112+ and Firefox Desktop 139+, using a s
 - [ ] Reload the extension and suspend its background context (Chrome worker / Firefox event page); verify saved preferences and protection.
 - [ ] Restart the browser with restored tabs and verify protection. For Firefox restart testing, use a signed, permanently installed build; temporary add-ons do not survive restart.
 - [ ] Test domain, wildcard, regex, multiple filters, invalid regex, disabled rules, and first-match precedence.
+- [ ] Select both ignore-case match types, test mixed-case URLs, save/reload and export/import, then switch back to case-sensitive matching. Confirm the dropdown, placeholder, and tester stay consistent.
 - [ ] Use every ordering menu action; check Escape, keyboard focus, narrow screens, and reduced motion.
 - [ ] Test match/no-match highlights and editing the URL; the layout stays stable.
 - [ ] Test open-tab/recent URL suggestions with arrows, Enter, Escape, mouse, duplicates, and incognito exclusions.

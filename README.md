@@ -12,7 +12,7 @@
 
 ## Features
 
-- Match domains, URL wildcards, or regular expressions.
+- Match domains, URL wildcards, or regular expressions, with optional ignore-case matching for wildcards and regex.
 - Combine multiple filters in one group: any filter can match.
 - Set group names, colours, and priority; first matching rule wins.
 - Preserve existing groups, or let rules regroup tabs and ungroup unmatched tabs.
@@ -24,7 +24,7 @@
 
 ### Chrome: from a release
 
-1. Download `tab-rules-0.2.0.zip` from [Releases](https://github.com/jakobdyrby/tab-rules/releases).
+1. Download `tab-rules-0.3.0.zip` from [Releases](https://github.com/jakobdyrby/tab-rules/releases).
 2. Extract it to a permanent folder; keep it there while the extension is installed.
 3. Open `chrome://extensions` in Chrome and enable **Developer mode**.
 4. Select **Load unpacked** and choose the extracted folder containing `manifest.json`.
@@ -50,7 +50,7 @@ Firefox Desktop **139 or later** is required for the native tab-group APIs. This
 4. Click **Load Temporary Add-on…** and select **`dist/firefox/manifest.json`**.
 5. Click the toolbar icon, open settings, and add rules or import a Chrome rule export.
 
-For a packaged build, extract `tab-rules-0.2.0-firefox.zip` and select its `manifest.json` in step 4. Temporary add-ons are removed when Firefox closes; export your rules before removing a temporary installation if you need a backup. Permanent installation in standard Firefox requires a Mozilla-signed add-on; the generated ZIP is unsigned. See the [release guide](docs/releasing.md).
+For a packaged build, extract `tab-rules-0.3.0-firefox.zip` and select its `manifest.json` in step 4. Temporary add-ons are removed when Firefox closes; export your rules before removing a temporary installation if you need a backup. Permanent installation in standard Firefox requires a Mozilla-signed add-on; the generated ZIP is unsigned. See the [release guide](docs/releasing.md).
 
 When developing, edit files under `extension/`, rerun `npm run package`, then click **Reload** in `about:debugging`. `dist/firefox/` is generated output. Chrome and Firefox keep separate local settings; use JSON export/import to transfer rules.
 
@@ -98,8 +98,8 @@ npm run package
 
 The package command writes two archives containing only runtime files with `manifest.json` at the root:
 
-- `dist/tab-rules-0.2.0.zip` — Chrome
-- `dist/tab-rules-0.2.0-firefox.zip` — Firefox
+- `dist/tab-rules-0.3.0.zip` — Chrome
+- `dist/tab-rules-0.3.0-firefox.zip` — Firefox
 
 It also writes unpacked builds to `dist/chrome/` and `dist/firefox/`.
 

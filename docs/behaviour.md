@@ -4,7 +4,7 @@
 
 Only HTTP/HTTPS URLs are matched. Pinned and incognito tabs are skipped. Enabled rules are evaluated in list order; the first rule with a matching filter wins. Filters within a rule are alternatives (OR).
 
-Domain filters match the exact hostname and subdomains, ignoring case. Wildcards match the whole URL: `*` is any text, with all other characters literal. Regex filters use JavaScript regular expressions without surrounding slashes or flags. Wildcard and regex matching are case-sensitive. Keep regexes simple: nested repetition can cause expensive matching. Regex execution is not currently time-limited.
+Domain filters match the exact hostname and subdomains, ignoring case. Wildcards match the whole URL: `*` is any text, with all other characters literal. Regex filters use JavaScript regular expressions without surrounding slashes or flags. Wildcard and regex matching are case-sensitive by default. Choose **URL wildcard (ignore case)** or **Regular expression (ignore case)** in the match-type dropdown to ignore case across the full URL. These choices save `ignoreCase: true` on the filter and use JavaScript’s `i` flag. Existing filters without this field keep their original behavior; import/export preserves the choice. Keep regexes simple: nested repetition can cause expensive matching. Regex execution is not currently time-limited.
 
 The extension checks newly opened tabs, URL changes, completed loads, unpinning, and window moves, with a short debounce. It uses a pending navigation URL when available; Firefox uses the tab's current URL.
 

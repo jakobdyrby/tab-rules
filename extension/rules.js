@@ -13,6 +13,7 @@ export function compileRule(rule) {
 
 export function compileFilter(rule) {
   if (!rule || typeof rule.pattern !== 'string') throw new Error('Enter a pattern.');
+  if (rule.ignoreCase !== undefined && typeof rule.ignoreCase !== 'boolean') throw new Error('Ignore case must be a boolean.');
   const pattern = rule.pattern.trim();
   if (!pattern) throw new Error('Enter a URL pattern.');
   if (rule.type === 'domain') {
@@ -27,11 +28,11 @@ export function compileFilter(rule) {
   }
   if (rule.type === 'wildcard') {
     const escaped = pattern.split('*').map(part => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
-    const regex = new RegExp(`^${escaped}$`);
+    const regex = new RegExp(`^${escaped}$`, rule.ignoreCase ? 'i' : '');
     return url => regex.test(url);
   }
   if (rule.type === 'regex') {
-    const regex = new RegExp(pattern);
+    const regex = new RegExp(pattern, rule.ignoreCase ? 'i' : '');
     return url => regex.test(url);
   }
   throw new Error('Choose a supported match type.');

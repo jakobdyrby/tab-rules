@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Tab Rules",
   "description": "Your URLs, your groups. Automatically organize Chrome tabs with local rules.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "minimum_chrome_version": "112",
   "permissions": [
     "tabs",

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.3.0 beta — 2026-11-12
+
+- Add ignore-case wildcard and regular-expression choices to the match-type dropdown. Preserve the per-filter choice in saved and exported settings; existing filters retain their matching behavior.
+
 ## 0.2.0 beta — 2026-11-06
 
 - Serialize grouping transactions per window, recheck before creating a native group, and reevaluate tabs changed during lookup. Preserve manual membership and existing duplicate groups.
